@@ -1,0 +1,13 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+
+#typing{
+	height: 20px;
+}
+
+#messages{
+	height: 300px;
+	width: 200px;
+}
