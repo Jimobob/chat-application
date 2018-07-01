@@ -1,17 +1,22 @@
 <% include ./partials/header %>
 
-<div id="chat">
-	<div id="messages">
+<div id="main">
+	<div id="people">
 	</div>
 
-	<div id="typing">
-		<p id="typing"></p>
-	</div>
+	<div id="chat">
+		<div id="messages"></div>
 
-	<form action="">
-		<input id="message" type="text" name="" autocomplete="off" placeholder="Enter text">
-		<button>Send</button>
-	</form>
+		<div id="bottom"> 
+			<div>
+				<p id="typing"></p>
+			</div>
+
+			<form action="">
+				<input id="message" type="text" name="" autocomplete="off" placeholder="Enter text, press enter to submit">
+			</form>
+		</div>
+	</div>
 </div>
 
 <% include ./partials/footer %>

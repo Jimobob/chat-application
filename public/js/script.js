@@ -37,7 +37,26 @@ $(function(){
 	});
 
 	socket.on("chat message", function(message){
-		console.log(message)
-		$("#messages").append("<p>"+message+"</p>");
+		var $parent = ($("<div>").attr("class", "parent-right")).append(
+			("<i class='fas fa-user-circle fa-4x right'></i>")
+		);
+
+		var $div = ($("<div>").attr("class", "speech-bubble-right")).append(
+			("<p class='message'>"+message+"</p>")
+		).appendTo($parent);
+
+		$parent.appendTo("#messages");
+	})
+
+	socket.on("other message", function(message){
+		var $parent = ($("<div>").attr("class", "parent-left")).append(
+			("<i class='fas fa-user-circle fa-4x left'></i>")
+		);
+
+		var $div = ($("<div>").attr("class", "speech-bubble-left")).append(
+			("<p class='message'>"+message+"</p>")
+		).appendTo($parent);
+
+		$parent.appendTo("#messages");
 	});
 });

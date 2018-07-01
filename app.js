@@ -14,7 +14,8 @@ app.use(express.static(__dirname + "/public"));
 
 io.on("connection", function(socket){
 	socket.on("chat message", function(message){
-		io.emit("chat message", message);
+		socket.emit("chat message", message);
+		socket.broadcast.emit("other message", message);
 	})
 
 	socket.on("typing", function(data){
