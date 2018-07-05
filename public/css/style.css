@@ -14,7 +14,9 @@ body, html{
 }
 
 .parent-left{
-	margin: 10px;
+	width: 600px;
+	padding: 10px;
+	padding-right: 0px;
 	display: block;
 	position: relative;
 	clear: both;
@@ -22,7 +24,9 @@ body, html{
 }
 
 .parent-right{
-	margin: 10px;
+	width: 600px;
+	padding: 10px;
+	padding-right: 0px;
 	display: block;
 	position: relative;
 	clear: both;
@@ -30,14 +34,9 @@ body, html{
 }
 
 .speech-bubble-left {
-	display: inline-block;
 	width: fit-content;
-	max-width: 400px;
-	position: relative;
 	background: #00aabb;
 	border-radius: 1.2em;
-	margin: 10px;
-	margin-left: 25px;
 	padding: 15px;
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -58,17 +57,28 @@ body, html{
 	float: left;
 }
 
+.right-display{
+	display: inline-block;
+	float: right;
+	max-width: 400px;
+	position: relative;
+	margin: 10px;
+	margin-right: 25px;
+}
+
+.left-display{
+	display: inline-block;
+	max-width: 400px;
+	position: relative;
+	margin: 10px;
+	margin-left: 25px;
+}
 
 
 .speech-bubble-right{
-	display: inline-block;
 	width: fit-content;
-	max-width: 400px;
-	position: relative;
 	background: #00aabb;
 	border-radius: 1.2em;
-	margin: 10px;
-	margin-right: 25px;
 	padding: 15px;
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -79,7 +89,7 @@ body, html{
 	content: '';
 	position: absolute;
 	right: 0;
-	top: 50%;
+	top: 15px;
 	width: 0;
 	height: 0;
 	border: 16px solid transparent;
@@ -87,14 +97,14 @@ body, html{
 	border-right: 0;
 	border-bottom: 0;
 	margin-top: -8px;
-	margin-right: -12px;
+	margin-right: -8px;
 }
 
 .speech-bubble-left:after {
 	content: '';
 	position: absolute;
 	left: 0;
-	top: 50%;
+	top: 15px;
 	width: 0;
 	height: 0;
 	border: 16px solid transparent;
@@ -102,7 +112,7 @@ body, html{
 	border-left: 0;
 	border-bottom: 0;
 	margin-top: -8px;
-	margin-left: -12px;
+	margin-left: -8px;
 }
 
 form{
@@ -115,7 +125,31 @@ form{
 	font-size: 18px;
 }
 
-input{
+#upload_input{
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+label{
+	width: 20px;
+}
+
+#inputs{
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+}
+
+#message-section{
+	flex: 1;
+}
+
+#message{
+	width: 100%;
 	background-color: #fff;
 	border-color: #e0e0e0;
 	-webkit-border-radius: 3px;
@@ -130,18 +164,38 @@ input{
 	padding-top: 10px;
 	padding-left: 10px;
 	padding-bottom: 10px;
-	width: 100%;
+	margin-left: -30px;
+	padding-right: 20px;
 }
 
-input:hover{
+#message:hover{
 	border-color: #e0e0e0;
 }
 
-input:focus{
+#message:focus{
 	border-color: #adadad;
 	-webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 5px rgba(160, 160, 160, 0.7);
 	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 5px rgba(160, 160, 160, 0.7);
 	outline: none;
+}
+
+.fa-paperclip{
+	padding: 5px;
+	color: grey;
+}
+
+.bottom-right{
+	position: absolute;
+	bottom: 0;
+	right: 90px;
+	font-size: 10px;
+}
+
+.bottom-left{
+	position: absolute;
+	bottom: 0;
+	left: 100px;
+	font-size: 10px;
 }
 
 #main{
@@ -152,7 +206,7 @@ input:focus{
 
 #people{
 	height: 100%;
-	width: 400px;
+	width: 30%;
 }
 
 #chat{
@@ -172,5 +226,5 @@ input:focus{
 #messages{
 	padding: 20px;
 	height: 100%;
-	overflow-y: auto;
+	overflow-y: scroll;
 }
