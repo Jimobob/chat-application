@@ -1,5 +1,6 @@
 var socket = io();
 
+var idNum = 0;
 var typing = false;
 var timeout = undefined;
 
@@ -14,6 +15,21 @@ function overflowBottom(){
 		var height = messageDiv[0].scrollHeight;
 		messageDiv.scrollTop(height);
 	}
+}
+
+function imgModal(url){
+	var imgUrl = url.src.substring(22, url.length);
+	$(".content").append("<i class='fas fa-times-circle fa-2x close'></i>");
+	$(".content").append("<img class='img-modal-size' src='" + imgUrl + "'>");
+	$(".fa-times-circle").on("click", function(){
+		$(".content").empty();
+		$(".modal").hide();
+	});
+	$(".modal").on("click", function(){
+		$(".modal").hide();
+		$(".content").empty();
+	})
+	$(".modal").css({display: 'flex'}).show();
 }
 
 $(function(){
@@ -48,16 +64,15 @@ $(function(){
 		}
 	});
 
-
 	socket.on("my image", function(url){
 		var $parent = ($("<div>").attr("class", "parent-right")).append(
 			("<i class='fas fa-user-circle fa-4x right'></i>")
 		);
 
-		var image = ("<img src='uploads/" + url.img + "'>");
+		var image = ("<img class='right-display' onclick='imgModal(this)' src='uploads/" + url.img + "'>");
 
 		var $img = ($("<div>")).append(
-			("<img class='right-display' src='uploads/" + url.img + "' height='200px'>")
+			image
 		).appendTo($parent);
 
 		$parent.append(("<p class='bottom-right'>"+url.date+", "+url.time+"</p>"));
@@ -69,14 +84,15 @@ $(function(){
 			("<i class='fas fa-user-circle fa-4x left'></i>")
 		);
 
-		var image = ("<img src='uploads/" + url.img + "'>");
+		var image = ("<img class='left-display' onclick='imgModal(this)' src='uploads/" + url.img + "'>");
 
 		var $img = ($("<div>")).append(
-			("<img class='left-display' src='uploads/" + url.img + "' height='200px'>")
+			image
 		).appendTo($parent);
 
 		$parent.append(("<p class='bottom-left'>"+url.date+", "+url.time+"</p>"));
 		$parent.appendTo("#messages");
+
 	});
 
 

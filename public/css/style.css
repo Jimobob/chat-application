@@ -23,6 +23,57 @@ body, html{
 	float: left;
 }
 
+.modal{
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background: rgba(0,0,0,0.6);
+}
+
+.content{
+	display: flex;
+	margin-top: 200px;
+	max-height: 850px;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	border-radius: 8px;
+	max-width: 1400px;
+	margin: auto;
+}
+
+.img-modal-size{
+	vertical-align: middle;	
+	max-width: 1400px;
+	max-height: 850px;
+	object-fit: contain;
+	width: 100%;
+}
+
+#messages img:hover{
+	opacity: 0.9;
+}
+
+.close{
+	object-fit: contain;
+	margin-left: auto;
+	color: #ffd2d1;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.close:hover,
+.close:focus{
+	color: #ffa09e;
+	text-decoration: none;
+	cursor: pointer;
+}
+
 .parent-right{
 	width: 600px;
 	padding: 10px;
@@ -33,14 +84,54 @@ body, html{
 	float: right;
 }
 
-.speech-bubble-left {
+.speech-bubble-right{
 	width: fit-content;
-	background: #00aabb;
+	background: #ffd2d1;
 	border-radius: 1.2em;
 	padding: 15px;
 	padding-top: 10px;
 	padding-bottom: 10px;
 	word-wrap: break-word;
+}
+
+.speech-bubble-right:after {
+	content: '';
+	position: absolute;
+	right: 0;
+	top: 15px;
+	width: 0;
+	height: 0;
+	border: 16px solid transparent;
+	border-left-color: #ffd2d1;
+	border-right: 0;
+	border-bottom: 0;
+	margin-top: -8px;
+	margin-right: -8px;
+}
+
+.speech-bubble-left {
+	width: fit-content;
+	background: #e4cbd1;
+	border-radius: 1.2em;
+	padding: 15px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	word-wrap: break-word;
+}
+
+.speech-bubble-left:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 15px;
+	width: 0;
+	height: 0;
+	border: 16px solid transparent;
+	border-right-color: #e4cbd1;
+	border-left: 0;
+	border-bottom: 0;
+	margin-top: -8px;
+	margin-left: -8px;
 }
 
 .right{
@@ -60,6 +151,7 @@ body, html{
 .right-display{
 	display: inline-block;
 	float: right;
+	max-height: 400px;
 	max-width: 400px;
 	position: relative;
 	margin: 10px;
@@ -68,51 +160,11 @@ body, html{
 
 .left-display{
 	display: inline-block;
+	max-height: 400px;
 	max-width: 400px;
 	position: relative;
 	margin: 10px;
 	margin-left: 25px;
-}
-
-
-.speech-bubble-right{
-	width: fit-content;
-	background: #00aabb;
-	border-radius: 1.2em;
-	padding: 15px;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	word-wrap: break-word;
-}
-
-.speech-bubble-right:after {
-	content: '';
-	position: absolute;
-	right: 0;
-	top: 15px;
-	width: 0;
-	height: 0;
-	border: 16px solid transparent;
-	border-left-color: #00aabb;
-	border-right: 0;
-	border-bottom: 0;
-	margin-top: -8px;
-	margin-right: -8px;
-}
-
-.speech-bubble-left:after {
-	content: '';
-	position: absolute;
-	left: 0;
-	top: 15px;
-	width: 0;
-	height: 0;
-	border: 16px solid transparent;
-	border-right-color: #00aabb;
-	border-left: 0;
-	border-bottom: 0;
-	margin-top: -8px;
-	margin-left: -8px;
 }
 
 form{
