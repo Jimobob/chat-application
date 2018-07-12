@@ -35,6 +35,26 @@ body, html{
 	background: rgba(0,0,0,0.6);
 }
 
+h2{
+	text-align: center;
+}
+
+.outer{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	border-radius: 10px;
+	height: 500px;
+	width: 100%;
+}
+
+.inner{
+	width: 30%;
+	background-color: pink;
+	padding: 20px;
+}
+
 .content{
 	display: flex;
 	margin-top: 200px;
@@ -148,6 +168,13 @@ body, html{
 	float: left;
 }
 
+.name-left{
+	display: block;
+	margin-top: -5px;
+	margin-left: 100px;
+	margin-bottom: -10px;
+}
+
 .right-display{
 	display: inline-block;
 	float: right;
@@ -167,7 +194,11 @@ body, html{
 	margin-left: 25px;
 }
 
-form{
+.inputs{
+	display: block;
+}
+
+.color{
 	background-color: #e5dfe0;
 	padding: 20px;
 	padding-right: 30px;

@@ -84,6 +84,8 @@ $(function(){
 			("<i class='fas fa-user-circle fa-4x left'></i>")
 		);
 
+		$parent.append(("<p class='name-left'>" + data.chatName + "</p>"));
+		
 		var image = ("<img class='left-display' onclick='imgModal(this)' src='uploads/" + url.img + "'>");
 
 		var $img = ($("<div>")).append(
@@ -124,6 +126,8 @@ $(function(){
 		var $parent = ($("<div>").attr("class", "parent-left")).append(
 			("<i class='fas fa-user-circle fa-4x left'></i>")
 		);
+
+		$parent.append(("<p class='name-left'>" + data.chatName + "</p>"));
 
 		var $div = ($("<div>").attr("class", "speech-bubble-left left-display")).append(
 			("<p class='message'>"+data.message+"</p>")
