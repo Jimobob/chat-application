@@ -2,12 +2,16 @@ var express = require("express");
 var moment = require("moment");
 var bodyParser = require("body-parser");
 var siofu = require("socketio-file-upload");
-var passportSocketIo = require("passport.socketio");
+
 var app = express().use(siofu.router);
 var http = require("http").createServer(app);
-var io = require("socket.io")(http);
+var io = require("socket.io")(http, {
+	pingInterval: 9000,
+	pingTimeout: 5000
+});
 var mongoose = require("mongoose");
 var User = require('./models/user.js');
+var Message = require('./models/message.js');
 var passport = require("passport");
 var localStrategy = require("passport-local");
 var passportLocalMongoose = require("passport-local-mongoose");
@@ -27,21 +31,24 @@ mongoose.connect(
 		}
 	});
 
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(require("express-session")({
+var session = require("express-session")({
 	store: new MongoStore({ mongooseConnection: mongoose.connection}),
 	secret: "carly slay legendsen",
-	resave: false,
-	saveUninitialized: false
+	key: "express.sid",
+	resave: true,
+	saveUninitialized: true,
+});
+
+app.use(session);
+
+var sharedsession = require("express-socket.io-session");
+
+io.use(sharedsession(session, {
+	autoSave: true
 }));
 
-io.use(passportSocketIo.authorize({
-	cookieParser: require("cookie-parser"),
-	secret: "carly slay legendsen",
-	store: new MongoStore({ mongooseConnection: mongoose.connection})
-}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
@@ -49,6 +56,14 @@ passport.deserializeUser(User.deserializeUser());
 
 app.set("view engine", "ejs");
 
+function isLoggedIn(req, res, next){
+	if(req.isAuthenticated()){
+		return next();
+	}
+	else{
+		res.redirect("/");
+	}
+}
 
 //==========
 // ROUTES
@@ -69,61 +84,116 @@ app.get("/register", function(req, res){
 	res.render("register");
 });
 
-app.get("/chat", function(req, res){
+app.get("/chat", isLoggedIn, function(req, res){
 	res.render("chat");
 });
 
 app.post("/register", function(req, res){
-	var username = req.body.username;
+	username = req.body.username;
 	var chatName = req.body.chatname;
-	console.log(username);
-	console.log(chatName);
 	User.register(new User({username: username, chatName: chatName}), req.body.password, function(err, user){
 		if(err){
 			console.log(err);
 			res.render("home");
 		}
 		passport.authenticate("local")(req, res, function(){
-				res.redirect("chat");
+			res.redirect("chat");
 		});
 	});
 });
 
+app.get("/logout", function(req, res){
+	req.logout();
+	res.redirect("/");
+});
+
 app.use(express.static(__dirname + "/public"));
 
+var time;
+var date;
+var timeStamp;
+
+setInterval(function(){
+	time = moment().format("LT");
+	date = moment().format("LL");
+	timeStamp = date + " at " + time;
+}, 1000);
+
+
+
 io.on("connection", function(socket){
-	var chatName = socket.request.user.chatName;
 	var uploader = new siofu();
 	uploader.dir = "public/uploads";
 	uploader.listen(socket);
 
-	var time = moment().format("LT");
-	var date = moment().format("LL");
-
-	socket.on("chat message", function(message){
-		if(message !== ""){
-			socket.emit("chat message", {message: message, time: time, date: date});
-			socket.broadcast.emit("other message", {message: message, time: time, date: date, chatName: chatName});
-		}
+	socket.on("logging in", function(e){
+		getChatName();
+		Message.find({}, function(err, messages){
+			socket.emit("old messages", messages);
+		});
 	})
 
+	var chatName;
+
+	function getChatName(){
+		var username = socket.handshake.session.passport.user;
+		var name = User.find({"username": username}, "chatName", function(err, return_item){
+			if(err){
+				console.log(err);
+			}
+			else{
+				chatName = return_item[0].chatName;
+				socket.emit("current user", chatName);
+			}
+		});
+	};
+
+
+
+	socket.on("chat message", function(message){
+		console.log(chatName);
+		if(message !== ""){
+			Message.create({chatName: chatName, message: message, timeStamp: timeStamp}, function(err, message){
+				if(err){
+					console.log(err);
+				}
+			});
+
+			socket.emit("chat message", {message: message, 
+										time: time, 
+										date: date, 
+										chatName: chatName,
+										timeStamp: new Date()});
+			socket.broadcast.emit("other message", {message: message, 
+										time: time, 
+										date: date, 
+										chatName: chatName, 
+										timeStamp: new Date()});
+		}
+	});
+
 	socket.on("typing", function(data){
-		console.log(data);
 		socket.broadcast.emit("typing", data);
 	});
 
 	socket.on("images", function(img){
+		getChatName;
 		console.log(img);
-		socket.emit("my image", {img: img, time: time, date: date});
-		socket.broadcast.emit("other image", {img: img, time: time, date: date});
+		socket.emit("my image", {img: img, 
+								time: time, 
+								date: date});
+		socket.broadcast.emit("other image", {img: img, 
+											time: time, 
+											date: date, 
+											chatName: chatName});
 	});
 
-	console.log("user entered");
+	console.log("connected to chat");
 	socket.on("disconnect", function(){
 		console.log("user disconnected");
-	})
-})
+	});
+});
 
 http.listen(3000, function(){
 	console.log("server listening");
-})
+});

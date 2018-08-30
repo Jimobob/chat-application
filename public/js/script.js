@@ -1,8 +1,10 @@
 var socket = io();
 
-var idNum = 0;
+var idNum = 0; //give each message an unique id
 var typing = false;
 var timeout = undefined;
+var chatName;
+var currentUser;
 
 function startTimeout(){
 	typing = false;
@@ -39,7 +41,9 @@ $(function(){
 	uploader.addEventListener("complete", function(event){
 		socket.emit("images", event.file.name);
 		console.log(event.file.name);
-	})
+	});
+
+	socket.emit("logging in", event);
 
 	$("#siofu_input").submit();
 
@@ -64,6 +68,83 @@ $(function(){
 		}
 	});
 
+	socket.on("current user", function(name){
+		console.log("GOING IN");
+		currentUser = name;
+		console.log(currentUser);
+		console.log(name);
+	});
+
+	function chatRight(message){
+		var $parent = ($("<div>").attr("class", "parent-right")).append(
+			("<i class='fas fa-user-circle fa-4x right'></i>")
+		);
+
+		var $div = ($("<div>").attr("class", "speech-bubble-right right-display")).append(
+			("<p class='message'>"+message.message+"</p>")
+		).appendTo($parent);
+
+		$parent.append(("<p class='bottom-right' id='" + timeID + "'> Just now </p>"));
+
+		$parent.appendTo("#messages");
+		overflowBottom();
+	};
+
+	function chatLeft(message){
+		var $parent = ($("<div>").attr("class", "parent-left")).append(
+			("<i class='fas fa-user-circle fa-4x left'></i>")
+		);
+
+		$parent.append(("<p class='name-left'>" + message.chatName + "</p>"));
+
+		var $div = ($("<div>").attr("class", "speech-bubble-left left-display")).append(
+			("<p class='message'>"+message.message+"</p>")
+		).appendTo($parent);
+
+		$parent.append(("<p class='bottom-left'>Just now</p>"));
+
+		$parent.appendTo("#messages");
+		overflowBottom();
+	}
+
+	//retrieve old messages from db and add to chat
+	socket.on("old messages", function(messages){
+		for(var i = 0; i < messages.length; i++){
+			console.log(currentUser);
+			console.log(messages[i].chatName);
+			if(currentUser == messages[i].chatName){
+				var $parent = ($("<div>").attr("class", "parent-right")).append(
+					("<i class='fas fa-user-circle fa-4x right'></i>")
+				);
+
+				var $div = ($("<div>").attr("class", "speech-bubble-right right-display")).append(
+					("<p class='message'>"+messages[i].message+"</p>")
+				).appendTo($parent);
+
+				$parent.append(("<p class='bottom-right'>" + messages[i].timeStamp + " </p>"));
+
+				$parent.appendTo("#messages");
+				overflowBottom();
+			}
+			else{
+				var $parent = ($("<div>").attr("class", "parent-left")).append(
+				("<i class='fas fa-user-circle fa-4x left'></i>")
+				);
+
+				$parent.append(("<p class='name-left'>" + messages[i].chatName + "</p>"));
+
+				var $div = ($("<div>").attr("class", "speech-bubble-left left-display")).append(
+					("<p class='message'>"+messages[i].message+"</p>")
+				).appendTo($parent);
+
+				$parent.append(("<p class='bottom-left'>" + messages[i].timeStamp + " </p>"));
+
+				$parent.appendTo("#messages");
+				overflowBottom();
+			}
+		}
+	});
+
 	socket.on("my image", function(url){
 		var $parent = ($("<div>").attr("class", "parent-right")).append(
 			("<i class='fas fa-user-circle fa-4x right'></i>")
@@ -85,7 +166,7 @@ $(function(){
 		);
 
 		$parent.append(("<p class='name-left'>" + data.chatName + "</p>"));
-		
+
 		var image = ("<img class='left-display' onclick='imgModal(this)' src='uploads/" + url.img + "'>");
 
 		var $img = ($("<div>")).append(
@@ -97,7 +178,6 @@ $(function(){
 
 	});
 
-
 	socket.on("typing", function(message){
 		if(typing==true){
 			$("#typing").html(message);
@@ -107,35 +187,39 @@ $(function(){
 		}
 	});
 
+	var messages = [];
+
+	var timeID = 0;
+
+
 	socket.on("chat message", function(data){
-		var $parent = ($("<div>").attr("class", "parent-right")).append(
-			("<i class='fas fa-user-circle fa-4x right'></i>")
-		);
+		chatName = data.chatName;
+		chatRight(data);
 
-		var $div = ($("<div>").attr("class", "speech-bubble-right right-display")).append(
-			("<p class='message'>"+data.message+"</p>")
-		).appendTo($parent);
+		messages.push({
+			id: timeID,
+			timeStamp: data.timeStamp
+		});
 
-		$parent.append(("<p class='bottom-right'>"+data.date+", "+data.time+"</p>"));
-
-		$parent.appendTo("#messages");
-		overflowBottom();
-	})
+		timeID++;
+	});
 
 	socket.on("other message", function(data){
-		var $parent = ($("<div>").attr("class", "parent-left")).append(
-			("<i class='fas fa-user-circle fa-4x left'></i>")
-		);
+		chatName = data.chatName;
+		chatLeft(data);
 
-		$parent.append(("<p class='name-left'>" + data.chatName + "</p>"));
+		messages.push({
+			id: timeID,
+			timeStamp: data.timeStamp
+		});
 
-		var $div = ($("<div>").attr("class", "speech-bubble-left left-display")).append(
-			("<p class='message'>"+data.message+"</p>")
-		).appendTo($parent);
-
-		$parent.append(("<p class='bottom-left'>"+data.date+", "+data.time+"</p>"));
-
-		$parent.appendTo("#messages");
-		overflowBottom();
+		timeID++;
 	});
+
+	setInterval(function(){
+		messages.forEach(function(message){
+			var time = moment(message.timeStamp).fromNow();
+			$("#" + message.id).text(time);
+		});
+	}, 1000);
 });
